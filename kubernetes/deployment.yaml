@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pucprbesarchcloud2026
+  labels:
+    app: pucprbesarchcloud2026
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pucprbesarchcloud2026
+  template:
+    metadata:
+      labels:
+        app: pucprbesarchcloud2026
+    spec:
+      containers:
+        - name: api
+          image: manoelvsneto/pucprbesarchcloud2026:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

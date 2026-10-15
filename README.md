@@ -1,1 +1,107 @@
-Teste
+# Todo API
+
+Backend REST em Node.js e TypeScript para gerenciamento de tarefas, organizado
+com Clean Architecture.
+
+## Requisitos
+
+- Node.js 22 ou superior
+- npm
+
+## Executar localmente
+
+```bash
+npm install
+npm run dev
+```
+
+A API fica disponível em `http://localhost:3000`. A documentacao interativa
+Swagger UI fica em `http://localhost:3000/api-docs`, e o documento OpenAPI em
+`http://localhost:3000/api-docs.json`.
+
+## Endpoints
+
+| Metodo | Rota | Descricao |
+| --- | --- | --- |
+| `POST` | `/api/todos` | Cria uma tarefa |
+| `GET` | `/api/todos` | Lista as tarefas |
+| `GET` | `/api/todos/:id` | Busca uma tarefa |
+| `PATCH` | `/api/todos/:id` | Atualiza uma tarefa |
+| `DELETE` | `/api/todos/:id` | Remove uma tarefa |
+
+Exemplo de criacao:
+
+```json
+{
+  "title": "Estudar Clean Architecture",
+  "description": "Organizar as dependencias do projeto"
+}
+```
+
+## Arquitetura
+
+- `src/domain`: entidade e regras de dominio, sem dependencias externas.
+- `src/application`: casos de uso e porta do repositorio.
+- `src/infrastructure`: adaptador de persistencia em memoria.
+- `src/presentation`: API HTTP, tratamento de erros e OpenAPI.
+- `src/main.ts`: composition root que conecta as camadas.
+
+O repositorio atual e em memoria: os dados sao perdidos quando o processo
+reinicia. Substitua o adaptador de persistencia para manter dados entre
+execucoes.
+
+## Testes e build
+
+```bash
+npm test
+npm run build
+```
+
+A suite inclui testes de integracao dos endpoints e testes de regras
+arquiteturais no estilo ArchUnit, que verificam as dependencias permitidas entre
+as camadas.
+
+## Docker
+
+```bash
+docker build -t todo-api .
+docker run --rm -p 3000:3000 todo-api
+```
+
+Para publicar no Docker Hub como `manoelvsneto/pucprbesarchcloud2026`, faca
+login e execute o script na raiz do projeto:
+
+```bat
+docker login
+publicar-dockerhub.bat
+```
+
+O script constroi e publica a tag `latest`.
+
+## Kubernetes
+
+Depois de publicar a imagem no Docker Hub e configurar o acesso ao cluster com
+`kubectl`, aplique os manifests:
+
+```bash
+kubectl apply -f kubernetes/
+```
+
+Isso cria um Deployment, um Service interno (`ClusterIP`) e um Ingress. O
+Ingress encaminha as requisicoes para o Service no host
+`pucprbesarchcloud2026.local`. Altere esse host em
+`kubernetes/ingress.yaml` para um dominio apontado para o controlador Ingress
+do cluster. O controlador (por exemplo, ingress-nginx) deve estar instalado.
+
+Para testar localmente, configure o DNS ou o arquivo `hosts` para apontar
+`pucprbesarchcloud2026.local` ao endereco do controlador Ingress. Como
+alternativa, use port-forward diretamente no Service:
+
+```bash
+kubectl port-forward service/pucprbesarchcloud2026 3000:3000
+```
+
+A API fica acessivel pelo host configurado no Ingress ou, via port-forward, em
+`http://localhost:3000`. O Deployment usa uma replica,
+pois a persistencia atual e em memoria; os dados nao sao compartilhados entre
+replicas e se perdem quando o pod reinicia.
