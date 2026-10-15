@@ -87,8 +87,8 @@ Depois de publicar a imagem no Docker Hub e configurar o acesso ao cluster com
 kubectl apply -f kubernetes/
 ```
 
-Isso cria um Deployment, um Service interno (`ClusterIP`) e um Ingress. O
-Ingress encaminha as requisicoes para o Service no host
+Isso cria um Deployment, um Service interno (`ClusterIP`), um Ingress e o
+namespace `manoelneto-dev`. O Ingress encaminha as requisicoes para o Service no host
 `pucprbesarchcloud2026.local`. Altere esse host em
 `kubernetes/ingress.yaml` para um dominio apontado para o controlador Ingress
 do cluster. O controlador (por exemplo, ingress-nginx) deve estar instalado.
@@ -98,7 +98,7 @@ Para testar localmente, configure o DNS ou o arquivo `hosts` para apontar
 alternativa, use port-forward diretamente no Service:
 
 ```bash
-kubectl port-forward service/pucprbesarchcloud2026 3000:3000
+kubectl port-forward -n manoelneto-dev service/pucprbesarchcloud2026 3000:3000
 ```
 
 A API fica acessivel pelo host configurado no Ingress ou, via port-forward, em

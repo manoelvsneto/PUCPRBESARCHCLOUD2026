@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pucprbesarchcloud2026
+  namespace: manoelneto-dev
   labels:
     app: pucprbesarchcloud2026
 spec:
