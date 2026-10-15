@@ -78,30 +78,30 @@ publicar-dockerhub.bat
 
 O script constroi e publica a tag `latest`.
 
-## Kubernetes
+## OpenShift / ROSA
 
-Depois de publicar a imagem no Docker Hub e configurar o acesso ao cluster com
-`kubectl`, aplique os manifests:
-
-```bash
-kubectl apply -f kubernetes/
-```
-
-Isso cria um Deployment, um Service interno (`ClusterIP`), um Ingress e o
-namespace `manoelneto-dev`. O Ingress encaminha as requisicoes para o Service no host
-`pucprbesarchcloud2026.local`. Altere esse host em
-`kubernetes/ingress.yaml` para um dominio apontado para o controlador Ingress
-do cluster. O controlador (por exemplo, ingress-nginx) deve estar instalado.
-
-Para testar localmente, configure o DNS ou o arquivo `hosts` para apontar
-`pucprbesarchcloud2026.local` ao endereco do controlador Ingress. Como
-alternativa, use port-forward diretamente no Service:
+Depois de publicar a imagem no Docker Hub e autenticar no cluster ROSA com
+`oc login`, aplique os manifests. Eles criam o namespace `manoelneto-dev`, um
+Deployment, um Service e uma Route HTTPS do OpenShift:
 
 ```bash
-kubectl port-forward -n manoelneto-dev service/pucprbesarchcloud2026 3000:3000
+oc apply -f kubernetes/
 ```
 
-A API fica acessivel pelo host configurado no Ingress ou, via port-forward, em
+Consulte o hostname atribuido pelo router do OpenShift:
+
+```bash
+oc get route pucprbesarchcloud2026 -n manoelneto-dev
+```
+
+A Route usa terminacao TLS `edge` e redireciona HTTP para HTTPS. Para testar
+diretamente o Service, sem passar pelo router:
+
+```bash
+oc port-forward -n manoelneto-dev service/pucprbesarchcloud2026 3000:3000
+```
+
+A API fica acessivel pelo hostname da Route ou, via port-forward, em
 `http://localhost:3000`. O Deployment usa uma replica,
 pois a persistencia atual e em memoria; os dados nao sao compartilhados entre
 replicas e se perdem quando o pod reinicia.

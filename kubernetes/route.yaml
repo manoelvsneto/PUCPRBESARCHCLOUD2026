@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pucprbesarchcloud2026
+  namespace: manoelneto-dev
+  labels:
+    app: pucprbesarchcloud2026
+spec:
+  to:
+    kind: Service
+    name: pucprbesarchcloud2026
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
